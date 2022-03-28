@@ -15,7 +15,7 @@ TBD
 
 # Team Project Members
 
-1. Emma Harper
-2. Kenneth Jones  
+1. Emma Harper (emha1608@colorado.edu)
+2. Kenneth Jones (kejo1166@colorado.edu)
 
 
