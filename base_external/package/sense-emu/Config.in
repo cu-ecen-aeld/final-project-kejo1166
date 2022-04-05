@@ -1,0 +1,5 @@
+
+config BR2_PACKAGE_SENSE_EMU
+	bool "sense-emu"
+	help
+	  This package emulates the Raspberry Pi Sense HAT. Inlcudes RTIMU module
