@@ -64,9 +64,12 @@ def main(args):
         logger.info('Sense Hat Live!: Test')
         sh = SenseHat()
         while True:
-            logger.info('Temperature = {:.1f}°C'.format(sh.get_temperature()))
-            logger.info('Humidity = {}%rH'.format(int(sh.get_humidity())))
+            logger.info('Temperature = {:.1f} °C'.format(sh.get_temperature()))
+            logger.info('Humidity = {} %rH'.format(int(sh.get_humidity())))
             logger.info('Pressure = {:.1f} mBar'.format(sh.get_pressure()))
+            logger.info('Orientation = p: {pitch:.1f}, r: {roll:.1f}, y: {yaw:.1f}'.format(**sh.get_orientation()))
+            logger.info('Compass = N {:.1f}'.format(sh.get_compass()))
+            logger.info('Acceleration = p: {pitch:.1f}, r: {roll:.1f}, y: {yaw:.1f}'.format(**sh.get_accelerometer()))
             time.sleep(1)
 
     except Exception as e:
