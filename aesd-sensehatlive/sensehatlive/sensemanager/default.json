@@ -1,0 +1,43 @@
+[
+  {
+    "name": "temperature",
+    "type": "float",
+    "units": "F",
+    "cos_threshold": 0.5,
+    "precision": 1
+  },
+  {
+    "name": "humidity",
+    "type": "int",
+    "units": "%",
+    "cos_threshold": 2.0
+  },
+  {
+    "name": "pressure",
+    "type": "float",
+    "units": "inHg",
+    "cos_threshold": 1.0,
+    "precision": 1
+  },
+  {
+    "name": "orientation",
+    "type": "int",
+    "units": "degrees",
+    "cos_threshold": 1.0,
+    "precision": 1
+  },
+  {
+    "name": "compass",
+    "type": "int",
+    "units": "degrees to N",
+    "cos_threshold": 1.0,
+    "precision": 1
+  },
+  {
+    "name": "accelerometer",
+    "type": "int",
+    "units": "degrees",
+    "cos_threshold": 1.0,
+    "precision": 1
+  }
+]

@@ -21,6 +21,7 @@ import sys
 
 # Ensure lib added to path, before any other imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib/'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'sensehatlive/'))
 
 import argparse
 import signal
@@ -28,8 +29,9 @@ import sys
 import time
 
 import sensehatlive.log.logger as logger
-from sense_hat import SenseHat
+from sensehatlive.sensemanager.manager import SenseHatManager
 
+sh = None
 
 def sig_handler(signum=None, frame=None):
     ''' Signal handler
@@ -38,7 +40,11 @@ def sig_handler(signum=None, frame=None):
     :return:
     '''
     if signum is not None:
-        logger.info("Signal %i caught, exiting...", signum)
+        logger.info("\nSignal %i caught, exiting...", signum)
+
+    if sh is not None:
+        sh.stop()
+        sh.join()
 
     # Clear exit
     sys.exit()
@@ -50,6 +56,7 @@ def main(args):
     :param args: Command line arguments
     :return:
     '''
+    global sh
 
     # Register signals
     signal.signal(signal.SIGINT, sig_handler)
@@ -61,7 +68,9 @@ def main(args):
     rc = 0
     try:
         logger.info('Sense Hat Live!: Producer')
-        #TODO: Create instance of sense hat manager
+        sh = SenseHatManager()
+        sh.start()
+
         while True:
             #TODO: Add code for main thread task
             time.sleep(1)
@@ -69,6 +78,8 @@ def main(args):
     except Exception as e:
         logger.error('Exception caught: ' + str(e))
 
+    sh.stop()
+    sh.join()
     sys.exit(rc)
 
 
