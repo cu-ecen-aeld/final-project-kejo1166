@@ -22,3 +22,9 @@ def degree_c_to_degree_f(temp_c):
     :param temp_c: Temperature in C
     '''
     return temp_c * 1.8 + 32.0
+
+def mbar_to_inhg(mbars):
+    ''' Converts millibars to inHg
+
+    '''
+    return mbars * 0.029530

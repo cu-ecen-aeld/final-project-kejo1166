@@ -184,7 +184,10 @@ class SenseHatManager(threading.Thread):
             self.humidity = self._process_sensor_val(cfg, val, self.humidity)
 
         elif cfg['name'] == 'pressure':
-            val = self._sh.get_pressure()
+            if cfg['units'] == 'inHg':
+                val = utils.mbar_to_inhg(self._sh.get_pressure())
+            else:
+                val = self._sh.get_pressure()
             self.pressure = self._process_sensor_val(cfg, val, self.pressure)
 
         elif cfg['name'] == 'orientation':
