@@ -16,6 +16,16 @@
 
 """
 
+import time
+
+def get_elasped_time(start_time, current_time):
+    ''' Get the elapsed amount of time
+
+    :param start_time: Start time
+    :param current_time: Current time
+    '''
+    return current_time - start_time
+
 def degree_c_to_degree_f(temp_c):
     ''' Converts temperature from C to F
 
