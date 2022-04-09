@@ -77,9 +77,12 @@ def main(args):
 
     except Exception as e:
         logger.error('Exception caught: ' + str(e))
+        rc = -1
 
-    sh.stop()
-    sh.join()
+    if sh is not None:
+        sh.stop()
+        sh.join()
+
     sys.exit(rc)
 
 

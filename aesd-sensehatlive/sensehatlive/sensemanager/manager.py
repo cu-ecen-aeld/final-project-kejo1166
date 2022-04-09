@@ -16,6 +16,10 @@
 
 """
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 import json
 import time
 import threading
@@ -23,12 +27,13 @@ import utils
 import log.logger as logger
 from sense_hat import SenseHat
 from datetime import datetime
+from sensehatlive.messagebroker.rabbitmq import RabbitMQProducer
 
-#LED colors
-LED_OFF = (0,0,0)
-LED_RED = (255,0,0)
-LED_GREEN = (0,255, 0)
-LED_BLUE = (0,0,255)
+# LED colors
+LED_OFF = (0, 0, 0)
+LED_RED = (255, 0, 0)
+LED_GREEN = (0, 255, 0)
+LED_BLUE = (0, 0, 255)
 
 # Defaults
 DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), 'default.json')
@@ -36,8 +41,6 @@ SENSE_HAT_CONFIG = os.path.join(os.path.dirname(__file__), 'config.json')
 TICKS = .500
 SAMPLE_INTERVAL = 1
 PUBLISH_INTERVAL = 30
-
-
 
 
 class SenseHatManager(threading.Thread):
@@ -70,25 +73,32 @@ class SenseHatManager(threading.Thread):
         # Load the sense hat config
         self._config = self._load_config(config_path)
 
+        # Clear LEDs
         self._sh.clear()
+
+        # Create instance of RabbitMQ producer to push data to server
+        self._broker = RabbitMQProducer('samples')
 
     def run(self):
         ''' Override threading run method
 
         '''
 
-        logger.info("Sense hat manager thread started")
+        logger.info("---- Sense hat manager thread started ----")
 
-        #Setup timers
+        # Start the message broker
+        self._broker.start()
+
+        # Setup timers
         current_time = time.monotonic()
-        sample_start = current_time + SAMPLE_INTERVAL
-        publish_start = current_time + PUBLISH_INTERVAL
+        sample_start = current_time - SAMPLE_INTERVAL
+        publish_start = current_time - PUBLISH_INTERVAL
 
         while not self._shutdown:
 
-            self._heartbeat() #heartbeat
+            self._heartbeat()  # heartbeat
 
-            if utils.get_elasped_time(sample_start, current_time ) >= SAMPLE_INTERVAL:
+            if utils.get_elasped_time(sample_start, current_time) >= SAMPLE_INTERVAL:
                 sample_start = current_time
 
                 # update all configured sensors
@@ -96,20 +106,23 @@ class SenseHatManager(threading.Thread):
                     self._update_sensor(sensor)
 
             if utils.get_elasped_time(publish_start, current_time) >= PUBLISH_INTERVAL:
-                publish_start = current_time
 
-                #TODO: publish sensor data using get_json_payloaf()
+                if self._broker.is_ready():
+                    # Publish sensor data to rabbitmq server
+                    self._broker.publish(self.get_json_payload())
+                    publish_start = current_time
 
             time.sleep(TICKS)
             current_time = time.monotonic()
 
-        logger.info("Sense hat manager thread stopped")
+        logger.info("[z] Sense hat manager thread stopped")
 
     def stop(self):
         ''' Stops the sense hat manager thread
 
         '''
         logger.debug("Stopping ...")
+        self._broker.stop()
         self._shutdown = True
 
     def get_json_payload(self):
@@ -143,7 +156,7 @@ class SenseHatManager(threading.Thread):
         ''' Heartbeat for device
 
         '''
-        color = self._sh.get_pixel(0,0)
+        color = self._sh.get_pixel(0, 0)
         color = LED_RED if color[0] == 0 else LED_OFF
         self._sh.set_pixel(0, 0, color)
 
@@ -289,8 +302,8 @@ class SenseHatManager(threading.Thread):
         for d in delta:
             if d >= cfg['cos_threshold']:
                 logger.info("New {} value: pitch: {}, roll: {}, yaw: {} {}".format(cfg['name'],
-                                                                            new_val['pitch'],
-                                                                            new_val['roll'],
-                                                                            new_val['yaw'],
-                                                                            cfg['units']))
+                                                                                   new_val['pitch'],
+                                                                                   new_val['roll'],
+                                                                                   new_val['yaw'],
+                                                                                   cfg['units']))
         return new_val
