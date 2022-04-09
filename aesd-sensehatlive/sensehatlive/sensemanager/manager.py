@@ -108,9 +108,12 @@ class SenseHatManager(threading.Thread):
             if utils.get_elasped_time(publish_start, current_time) >= PUBLISH_INTERVAL:
 
                 if self._broker.is_ready():
+                    self._sh.set_pixel(1, 0, LED_BLUE)
                     # Publish sensor data to rabbitmq server
                     self._broker.publish(self.get_json_payload())
                     publish_start = current_time
+                else:
+                    self._sh.set_pixel(1, 0, LED_OFF)
 
             time.sleep(TICKS)
             current_time = time.monotonic()
