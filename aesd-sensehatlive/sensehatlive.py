@@ -63,7 +63,7 @@ def main(args):
     signal.signal(signal.SIGTERM, sig_handler)
 
     # Initialize the logger
-    logger.initLogger(console=not args.quiet, log_dir=False, verbose=args.verbose)
+    logger.initLogger(console=not args.quiet, log_dir=os.path.dirname(__file__), verbose=args.verbose)
 
     rc = 0
     try:
