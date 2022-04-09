@@ -22,6 +22,7 @@ import threading
 import utils
 import log.logger as logger
 from sense_hat import SenseHat
+from datetime import datetime
 
 #LED colors
 LED_OFF = (0,0,0)
@@ -33,8 +34,8 @@ LED_BLUE = (0,0,255)
 DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), 'default.json')
 SENSE_HAT_CONFIG = os.path.join(os.path.dirname(__file__), 'config.json')
 TICKS = .500
-TICKS_1SEC = 1 / TICKS
-TICKS_30SEC = 30 / TICKS
+SAMPLE_INTERVAL = 1
+PUBLISH_INTERVAL = 30
 
 
 
@@ -60,6 +61,9 @@ class SenseHatManager(threading.Thread):
         self.orientation = {'pitch': 0, 'roll': 0, 'yaw': 0}
         self.accelerometer = {'pitch': 0, 'roll': 0, 'yaw': 0}
 
+        # Use mac address as unique Id
+        self.mac_address = self._parse_mac_address()
+
         # Get instance of sense hat
         self._sh = SenseHat()
 
@@ -74,19 +78,30 @@ class SenseHatManager(threading.Thread):
         '''
 
         logger.info("Sense hat manager thread started")
-        n_1sec_ticks = TICKS_1SEC
+
+        #Setup timers
+        current_time = time.monotonic()
+        sample_start = current_time + SAMPLE_INTERVAL
+        publish_start = current_time + PUBLISH_INTERVAL
+
         while not self._shutdown:
+
             self._heartbeat() #heartbeat
 
-            if n_1sec_ticks >= TICKS_1SEC:
-                n_1sec_ticks = 0
+            if utils.get_elasped_time(sample_start, current_time ) >= SAMPLE_INTERVAL:
+                sample_start = current_time
 
                 # update all configured sensors
                 for sensor in self._config:
                     self._update_sensor(sensor)
 
+            if utils.get_elasped_time(publish_start, current_time) >= PUBLISH_INTERVAL:
+                publish_start = current_time
+
+                #TODO: publish sensor data using get_json_payloaf()
+
             time.sleep(TICKS)
-            n_1sec_ticks += 1
+            current_time = time.monotonic()
 
         logger.info("Sense hat manager thread stopped")
 
@@ -96,6 +111,33 @@ class SenseHatManager(threading.Thread):
         '''
         logger.debug("Stopping ...")
         self._shutdown = True
+
+    def get_json_payload(self):
+        ''' Get the sense hat payload
+
+        '''
+        payload = {
+            "id": self.mac_address,  # mac address
+            "ts": int(datetime.utcnow().timestamp()),
+            "temperature": self.temperature,
+            "humidity": self.humidity,
+            "pressure": self.pressure,
+            'compass': self.compass,
+            "orientation": self.orientation,
+            "acceleration": self.accelerometer
+        }
+        return payload
+
+    def _parse_mac_address(self, interface='eth0'):
+        ''' Get the mac address of interface
+
+        :param interface: To get mac address from
+        '''
+        try:
+            mac_address = open('/sys/class/net/' + interface + '/address').readline().strip()
+        except:
+            mac_address = "00:00:00:00:00:00"
+        return mac_address
 
     def _heartbeat(self):
         ''' Heartbeat for device

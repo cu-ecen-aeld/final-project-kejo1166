@@ -40,7 +40,7 @@ def sig_handler(signum=None, frame=None):
     :return:
     '''
     if signum is not None:
-        logger.info("\nSignal %i caught, exiting...", signum)
+        logger.info("Signal %i caught, exiting...", signum)
 
     if sh is not None:
         sh.stop()
