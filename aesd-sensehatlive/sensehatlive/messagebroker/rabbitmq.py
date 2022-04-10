@@ -18,6 +18,7 @@ Reference   : Pika async examples https://github.com/pika/pika/tree/master/examp
 """
 import os
 import sys
+import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
@@ -517,6 +518,7 @@ class RabbitMQProducer(RabbitMQBase):
         '''
         super(RabbitMQProducer, self).__init__(queue, path, **kwargs)  # Base class initialization
         self._publish_count = None
+        self._allow_reconnect = True
         self._ack = None
         self._nack = None
         self.reset_stats()
@@ -591,7 +593,7 @@ class RabbitMQProducer(RabbitMQBase):
                                                                          (self._nack / self._publish_count)))
 
     def run(self):
-        logger.info("Producer thread started")
+        logger.info("---- Producer thread started")
 
         while not self._shutdown:
             self._connection = None
@@ -601,13 +603,19 @@ class RabbitMQProducer(RabbitMQBase):
                 self._connection.ioloop.start()
             except Exception as e:
                 logger.info("Stopping producer ...")
-                self._shutdown = True
+                self._ready = False
                 if (self._connection is not None and not self._connection.is_closed):
                     # Finish closing
-                    self._connection.ioloop.start()
-                break
+                    self._connection.ioloop.stop()
 
-        logger.info("Producer thread stopped")
+                if self._allow_reconnect:
+                    logger.warning('Reconnecting in {}s ...'.format(DEFAULT_RETRY_TIMEOUT_SEC))
+                    time.sleep(DEFAULT_RETRY_TIMEOUT_SEC)
+                else:
+                    self._shutdown = True
+                    break
+
+        logger.info("[z] Producer thread stopped")
 
     def stop(self):
         ''' Stop the producer
