@@ -1,0 +1,4 @@
+config BR2_PACKAGE_AESD_SENSEHATLIVE
+	bool "aesd-sensehatlive"
+	help
+	  Sense hat live applicaiton.  This is the producer version of sense hat live.
