@@ -97,6 +97,11 @@ class SenseHatManager(threading.Thread):
         while not self._shutdown:
 
             self._heartbeat()  # heartbeat
+            if self._broker.is_ready():
+                self._indicate_pub_enabled()
+            else:
+                self._indicate_pub_disabled()
+
 
             if utils.get_elasped_time(sample_start, current_time) >= SAMPLE_INTERVAL:
                 sample_start = current_time
@@ -108,12 +113,9 @@ class SenseHatManager(threading.Thread):
             if utils.get_elasped_time(publish_start, current_time) >= PUBLISH_INTERVAL:
 
                 if self._broker.is_ready():
-                    self._sh.set_pixel(1, 0, LED_BLUE)
                     # Publish sensor data to rabbitmq server
                     self._broker.publish(self.get_json_payload())
                     publish_start = current_time
-                else:
-                    self._sh.set_pixel(1, 0, LED_OFF)
 
             time.sleep(TICKS)
             current_time = time.monotonic()
@@ -125,6 +127,7 @@ class SenseHatManager(threading.Thread):
 
         '''
         logger.debug("Stopping ...")
+        self._indicate_pub_disabled()
         self._broker.stop()
         self._shutdown = True
 
@@ -143,6 +146,18 @@ class SenseHatManager(threading.Thread):
             "acceleration": self.accelerometer
         }
         return payload
+
+    def _indicate_pub_enabled(self):
+        ''' Indicates publishing is enabled
+
+        '''
+        self._sh.set_pixel(1, 0, LED_BLUE)
+
+    def _indicate_pub_disabled(self):
+        ''' Indicates publishing is disabled
+
+        '''
+        self._sh.set_pixel(1, 0, LED_OFF)
 
     def _parse_mac_address(self, interface='eth0'):
         ''' Get the mac address of interface
