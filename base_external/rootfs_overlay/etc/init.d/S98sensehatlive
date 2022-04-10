@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+# Start/stop sensehatlive
+#
+
+DAEMON=/opt/aesd-sensehatlive/sensehatlive.py
+PIDFILE=/opt/aesd-sensehatlive/sensehatlive.pid
+
+case "$1" in
+  start)
+	echo "Starting sense hat live ..."
+	modprobe i2c-dev
+	modprobe i2c-bcm2835
+	sleep 2
+	start-stop-daemon -S -x "$DAEMON" -- -d --pidfile "$PIDFILE"
+	;;
+  stop)
+	echo "Stopping sense hat live ..."
+	start-stop-daemon -K -p "$PIDFILE" -o
+	# Check if pid still exist then remove it
+	if [ -e "$PIDFILE" ]
+	then
+    		rm "$PIDFILE"
+	fi 
+	;;
+  restart)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
