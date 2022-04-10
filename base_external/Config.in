@@ -1,3 +1,4 @@
 source "$BR2_EXTERNAL_project_base_PATH/package/wheel/Config.in"
 source "$BR2_EXTERNAL_project_base_PATH/package/sense-hat/Config.in"
 source "$BR2_EXTERNAL_project_base_PATH/package/sense-emu/Config.in"
+source "$BR2_EXTERNAL_project_base_PATH/package/pika/Config.in"
