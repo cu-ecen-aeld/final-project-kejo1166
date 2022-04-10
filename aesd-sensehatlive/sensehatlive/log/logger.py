@@ -221,7 +221,7 @@ def initHooks(global_exceptions=True, thread_exceptions=True, pass_original=True
 
 # Expose logger methods
 info = logger.info
-warn = logger.warn
+warn = logger.warning
 error = logger.error
 debug = logger.debug
 warning = logger.warning

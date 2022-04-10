@@ -79,6 +79,8 @@ class SenseHatManager(threading.Thread):
         # Create instance of RabbitMQ producer to push data to server
         self._broker = RabbitMQProducer('samples')
 
+        logger.info('Device ID: {}'.format(self.mac_address))
+
     def run(self):
         ''' Override threading run method
 
