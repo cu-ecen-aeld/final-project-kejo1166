@@ -197,7 +197,13 @@ class SenseHatManager(threading.Thread):
                 logger.debug('Sense had config successfully loaded')
                 return data
         except Exception as e:
-            raise Exception(str(e))
+            if os.path.exists(path):
+                os.remove(path)
+                
+            with open(DEFAULT_CONFIG) as f:
+                data = json.load(f)
+                logger.debug('Sense had default config successfully loaded')
+                return data
 
     def _default_config(self, path):
         ''' Create a default sense hat configuration and saves to default
@@ -206,6 +212,7 @@ class SenseHatManager(threading.Thread):
         '''
         try:
             shutil.copyfile(DEFAULT_CONFIG, path)
+            os.chmod(path, 0o755) # set permission
         except Exception as e:
             logger.error("Could not create default config file, Reason=" + str(e))
             return False
