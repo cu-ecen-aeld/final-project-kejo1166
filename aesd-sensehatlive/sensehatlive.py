@@ -62,9 +62,9 @@ def main(args):
 
         # If the pidfile already exists, sense hat live may still be running, so exit
         if os.path.exists(sensehatlive.PIDFILE):
-            msg = "PID file '{}' already exists. Exiting.".format(sensehatlive.PIDFILE)
+            msg = "PID file '{}' already exists. Removing ...".format(sensehatlive.PIDFILE)
             logger.warning(msg)
-            raise SystemExit(msg)
+            os.remove(sensehatlive.PIDFILE)
 
         # The pidfile is only useful in daemon mode, make sure we can write the file properly
         if sensehatlive.DAEMON:
