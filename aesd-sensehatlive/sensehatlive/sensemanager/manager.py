@@ -24,6 +24,7 @@ import json
 import time
 import threading
 import utils
+import shutil
 import log.logger as logger
 from sense_hat import SenseHat
 from datetime import datetime
@@ -204,11 +205,7 @@ class SenseHatManager(threading.Thread):
         :param path: Path to save file
         '''
         try:
-            with open(DEFAULT_CONFIG) as f:
-                config = json.load(f)
-
-            with open(path, 'w') as f:
-                f.writelines(json.dumps(config))
+            shutil.copyfile(DEFAULT_CONFIG, path)
         except Exception as e:
             logger.error("Could not create default config file, Reason=" + str(e))
             return False
