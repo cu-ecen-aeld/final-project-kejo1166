@@ -5,7 +5,7 @@
 ##############################################################
 
 # Repository version
-AESD_SENSEHATLIVE_VERSION = 18b0afe0c25705ec731986396f065aa1c6222a4c
+AESD_SENSEHATLIVE_VERSION = a84a33f1fc8b4c71351be898958019668fc3021e
 
 # Note: Be sure to reference the *ssh* repository URL here (not https) to work properly
 # with ssh keys and the automated build/test system.
