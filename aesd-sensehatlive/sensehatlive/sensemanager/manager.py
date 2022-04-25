@@ -279,7 +279,10 @@ class SenseHatManager(threading.Thread):
 
         elif cfg['name'] == 'accelerometer':
             self._sh.set_imu_config(False, False, True)  # gyroscope only
-            val = self._sh.get_accelerometer()
+            val = self._sh.get_accelerometer_raw()
+            val['pitch'] = val.pop('x')
+            val['roll'] = val.pop('y')
+            val['yaw'] = val.pop('z')
             self.accelerometer = self._process_imu_vals(cfg, val, self.accelerometer)
 
         else:

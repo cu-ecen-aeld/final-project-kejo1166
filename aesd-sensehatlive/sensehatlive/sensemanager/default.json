@@ -36,8 +36,8 @@
   {
     "name": "accelerometer",
     "type": "int",
-    "units": "degrees",
-    "cos_threshold": 1.0,
+    "units": "G",
+    "cos_threshold": 0.1,
     "precision": 1
   }
 ]
