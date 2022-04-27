@@ -11,7 +11,9 @@ Click [here](https://github.com/cu-ecen-aeld/final-project-emma-harper/wiki/Sche
 
 # Final Project Demo Overview
 
-TBD
+Click [here](https://github.com/cu-ecen-aeld/final-project-emma-harper/wiki/Kenneth's-Final-Project-Video) for final project demo.
+
+
 
 # Team Project Members
 
